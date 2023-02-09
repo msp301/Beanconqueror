@@ -33,6 +33,8 @@ RUN sdkmanager \
     unzip -o platform-tools.zip && \
     rm platform-tools.zip
 
+RUN sdkmanager "build-tools;30.0.3"
+
 RUN sdkmanager "platforms;android-31"
 
 WORKDIR /usr/src/app
