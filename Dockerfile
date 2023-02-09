@@ -47,5 +47,28 @@ RUN npm ci
 COPY . .
 EXPOSE 4200
 #RUN chown -R node /usr/src/app
-USER node
+#USER node
+
+#RUN ionic cordova build android || true
+
+RUN ls node_modules/cordova-plugin-x-socialsharing/plugin.xml >>/dev/null && sed -i 's|\
+    <receiver android:name="nl.xservices.node_modules.ShareChooserPendingIntent" android:enabled="true">|\
+    <receiver android:name="nl.xservices.node_modules.ShareChooserPendingIntent" android:enabled="true" android:exported="false">\
+    |' node_modules/cordova-plugin-x-socialsharing/plugin.xml
+
+RUN ls node_modules/cordova-plugin-telerik-imagepicker/plugin.xml >>/dev/null && sed -i 's|\
+    <activity android:label="@string/multi_app_name" android:name="com.synconset.MultiImageChooserActivity" android:theme="@style/Theme.AppCompat.Light">|\
+    <activity android:label="@string/multi_app_name" android:name="com.synconset.MultiImageChooserActivity" android:theme="@style/Theme.AppCompat.Light" android:exported="false">\
+    |' node_modules/cordova-plugin-telerik-imagepicker/plugin.xml
+
+RUN ls node_modules/fttx-phonegap-plugin-barcodescanner/plugin.xml >>/dev/null && sed -i 's|\
+    <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share"/>|\
+    <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share" android:exported="false"/>\
+    |' node_modules/fttx-phonegap-plugin-barcodescanner/plugin.xml
+
+RUN ls node_modules/cordova-plugin-file/src/android/ContentFilesystem.java >>/dev/null && sed -i 's|\
+    String authorityAndPath = inputURL.uri.getEncodedPath().substring(this.name.length() + 2);|\
+    String encodedPath = inputURL.uri.getEncodedPath(); String authorityAndPath = encodedPath.substring(encodedPath.indexOf(this.name) + 1 + this.name.length() + 2);\
+    |' node_modules/cordova-plugin-file/src/android/ContentFilesystem.java
+
 CMD ["npm", "start"]
